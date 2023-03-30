@@ -1,28 +1,48 @@
 import FormData from "form-data";
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { Buffer } from "buffer";
+import { create as createUrl, parse as parseUrl } from "simple-url";
 
 export const ipfsUpload = async (ipfsUrl: string, content: string) => {
   if (!content) throw new Error("No content to upload");
 
-  const url = new URL("/api/v0/add", ipfsUrl);
-  const opts: AxiosRequestConfig = {};
-
-  if (url.username) {
-    opts.auth = {
-      username: url.username,
-      password: url.password,
-    };
-  }
-
+  const { url, headers } = createIpfsUrl(ipfsUrl, "/api/v0/add");
   const formData = new FormData();
   const buff = Buffer.from(content);
 
   formData.append("data", Buffer.from(buff));
 
-  const result = await axios.post(url.toString(), formData, opts);
+  const res = await axios.post(url, formData, { headers });
 
-  console.log("uploaded", result.statusText, result.data.Hash);
+  console.log("uploaded", res.statusText, res.data.Hash);
 
-  return result.data.Hash;
+  return res.data.Hash;
 };
+
+// Create an ipfs url with compatibility for custom auth and https+ipfs:// protocol
+function createIpfsUrl(base: string, pathname: string) {
+  const parsedUrl = parseUrl(base);
+  const headers: { [k: string]: string } = {};
+
+  const customProtocol = parsedUrl.protocol.endsWith("+ipfs");
+
+  const uri = {
+    protocol: customProtocol
+      ? parsedUrl.protocol.split("+")[0]
+      : parsedUrl.protocol,
+    host:
+      customProtocol && !parsedUrl.host.includes(":")
+        ? `${parsedUrl.host}:5001`
+        : parsedUrl.host,
+    pathname,
+    query: parsedUrl.query,
+    hash: parsedUrl.hash,
+  };
+
+  if (parsedUrl.auth) {
+    const [username, password] = parsedUrl.auth.split(":");
+    headers["Authorization"] = `Basic ${btoa(`${username}:${password}`)}`;
+  }
+
+  return { url: createUrl(uri), headers };
+}
