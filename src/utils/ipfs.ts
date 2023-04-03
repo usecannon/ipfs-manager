@@ -56,7 +56,7 @@ export async function writeIpfs(ipfsUrl: string, content: string) {
 }
 
 export async function readIpfs(ipfsUrl: string, cid: string): Promise<any> {
-  const { url, headers } = createIpfsUrl(ipfsUrl, `/ipfs/${cid}`)
+  const { url, headers } = createIpfsUrl(ipfsUrl, `/api/v0/cat?arg=${cid}`)
 
   const res = await axios.get(url, {
     responseType: 'arraybuffer',
