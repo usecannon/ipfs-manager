@@ -3,7 +3,7 @@ import axios from "axios";
 import { Buffer } from "buffer";
 import { create as createUrl, parse as parseUrl } from "simple-url";
 
-export const ipfsUpload = async (ipfsUrl: string, content: string) => {
+export async function ipfsUpload(ipfsUrl: string, content: string) {
   if (!content) throw new Error("No content to upload");
 
   const { url, headers } = createIpfsUrl(ipfsUrl, "/api/v0/add");
@@ -17,10 +17,10 @@ export const ipfsUpload = async (ipfsUrl: string, content: string) => {
   console.log("uploaded", res.statusText, res.data.Hash);
 
   return res.data.Hash;
-};
+}
 
 // Create an ipfs url with compatibility for custom auth and https+ipfs:// protocol
-function createIpfsUrl(base: string, pathname: string) {
+export function createIpfsUrl(base: string, pathname: string) {
   const parsedUrl = parseUrl(base);
   const headers: { [k: string]: string } = {};
 
