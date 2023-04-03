@@ -1,13 +1,13 @@
-import { ChangeEvent } from "react";
-import { Textarea as TextareaElement } from "@nextui-org/react";
+import { Textarea as TextareaElement } from '@nextui-org/react'
 
 interface Props {
-  name: string;
-  value: string;
-  label: string;
-  placeholder: string;
-  onChange: (val: string) => void;
-  required?: boolean;
+  name: string
+  value: string
+  label: string
+  placeholder?: string
+  onChange?: (val: string) => void
+  readOnly?: boolean
+  required?: boolean
 }
 
 export function Textarea({
@@ -17,20 +17,18 @@ export function Textarea({
   label,
   onChange,
   required,
+  readOnly = false,
 }: Props) {
   return (
-    <div>
-      <TextareaElement
-        name={name}
-        value={value}
-        label={label}
-        placeholder={placeholder}
-        onChange={(evt: ChangeEvent<HTMLTextAreaElement>) =>
-          onChange(evt.target.value)
-        }
-        required={required}
-        fullWidth
-      />
-    </div>
-  );
+    <TextareaElement
+      name={name}
+      value={value}
+      label={label}
+      placeholder={placeholder}
+      onChange={(evt) => onChange && onChange(evt.target.value)}
+      required={required}
+      readOnly={readOnly}
+      fullWidth
+    />
+  )
 }

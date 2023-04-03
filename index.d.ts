@@ -1,1 +1,1 @@
-declare module "simple-url";
+declare module 'simple-url'
