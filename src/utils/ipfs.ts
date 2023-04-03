@@ -64,5 +64,5 @@ export async function readIpfs(ipfsUrl: string, cid: string): Promise<any> {
     headers,
   })
 
-  return res.data
+  return Buffer.from(res.data).toString('utf8')
 }

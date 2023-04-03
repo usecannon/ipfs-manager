@@ -6,16 +6,17 @@ import { Textarea } from '../components/Textarea'
 import { parseIpfsHash, readIpfs, writeIpfs } from '../utils/ipfs'
 
 export default function Upload() {
-  const [ipfsUrl, setIpfsUrl] = useState('http://localhost:5001')
+  const [ipfsUploadUrl, setIpfsUploadUrl] = useState('http://localhost:5001')
   const [content, setContent] = useState('')
 
+  const [ipfsDownloadUrl, setIpfsDownloadUrl] = useState('https://ipfs.io')
   const [previewUrl, setPreviewUrl] = useState('')
   const [previewContent, setPreviewContent] = useState('')
 
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
-    readPreview()
+    downloadPreview()
   }, [previewUrl])
 
   async function upload() {
@@ -23,17 +24,17 @@ export default function Upload() {
     setUploading(true)
 
     try {
-      const hash = await writeIpfs(ipfsUrl, content)
+      const hash = await writeIpfs(ipfsUploadUrl, content)
       setPreviewUrl(`ipfs://${hash}`)
     } finally {
       setUploading(false)
     }
   }
 
-  async function readPreview() {
+  async function downloadPreview() {
     const hash = parseIpfsHash(previewUrl)
     if (!hash) return setPreviewContent('')
-    const newContent = await readIpfs(ipfsUrl, hash)
+    const newContent = await readIpfs(ipfsDownloadUrl, hash)
     setPreviewContent(newContent)
   }
 
@@ -41,10 +42,10 @@ export default function Upload() {
     <Container xs>
       <Input
         name="ipfsUrl"
-        value={ipfsUrl}
-        label={'IPFS Node Url'}
+        value={ipfsUploadUrl}
+        label={'IPFS Upload Url'}
         placeholder={'Enter and ipfs url...'}
-        onChange={setIpfsUrl}
+        onChange={setIpfsUploadUrl}
         required
       />
       <Spacer />
@@ -59,12 +60,21 @@ export default function Upload() {
       <Spacer />
       <Button
         css={{ minWidth: '100%' }}
-        disabled={!ipfsUrl || !content || uploading}
+        disabled={!ipfsUploadUrl || !content || uploading}
         onPress={upload}
       >
         Upload
       </Button>
       <Spacer y={2} />
+      <Input
+        name="ipfsDownloadUrl"
+        value={ipfsDownloadUrl}
+        label={'IPFS Download Url'}
+        placeholder={'Enter and ipfs url...'}
+        onChange={setIpfsDownloadUrl}
+        required
+      />
+      <Spacer />
       <Input
         name="previewUrl"
         value={previewUrl}
