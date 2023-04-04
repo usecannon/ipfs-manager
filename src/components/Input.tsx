@@ -4,9 +4,10 @@ interface Props {
   name: string
   value: string
   label: string
-  onChange: (val: string) => void
+  onChange?: (val: string) => void
   placeholder?: string
   valid?: boolean
+  readOnly?: boolean
   required?: boolean
 }
 
@@ -17,6 +18,7 @@ export function Input({
   label,
   onChange,
   valid = true,
+  readOnly,
   required,
 }: Props) {
   return (
@@ -25,10 +27,11 @@ export function Input({
       value={value}
       label={label}
       placeholder={placeholder}
-      onChange={(evt) => onChange(evt.target.value)}
+      onChange={(evt) => onChange && onChange(evt.target.value)}
       color={valid ? 'default' : 'error'}
       status={valid ? 'default' : 'error'}
       required={required}
+      readOnly={readOnly}
       fullWidth
     />
   )

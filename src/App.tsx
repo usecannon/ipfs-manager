@@ -1,5 +1,6 @@
 import { NextUIProvider } from '@nextui-org/react'
 
+import History from './pages/History'
 import Upload from './pages/Upload'
 import { Layout, Page } from './components/Layout'
 
@@ -10,7 +11,9 @@ export function App() {
         <Page title="Upload">
           <Upload />
         </Page>
-        <Page title="History"></Page>
+        <Page title="History">
+          <History />
+        </Page>
       </Layout>
     </NextUIProvider>
   )

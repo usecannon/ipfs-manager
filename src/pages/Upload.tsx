@@ -1,11 +1,15 @@
 import { Button, Container, Spacer } from '@nextui-org/react'
 import { useEffect, useState } from 'react'
 
+import { HistoryItem } from './History'
 import { Input } from '../components/Input'
 import { Textarea } from '../components/Textarea'
 import { parseIpfsHash, readIpfs, writeIpfs } from '../utils/ipfs'
+import { useItemsList } from '../utils/db'
 
 export default function Upload() {
+  const { add } = useItemsList<HistoryItem>('upload-history')
+
   const [ipfsUploadUrl, setIpfsUploadUrl] = useState('http://localhost:5001')
   const [content, setContent] = useState('')
 
@@ -25,6 +29,7 @@ export default function Upload() {
 
     try {
       const hash = await writeIpfs(ipfsUploadUrl, content)
+      await add({ id: hash, content })
       setPreviewUrl(`ipfs://${hash}`)
     } finally {
       setUploading(false)

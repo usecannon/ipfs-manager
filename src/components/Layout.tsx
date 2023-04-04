@@ -1,4 +1,3 @@
-import { BrowserRouter } from 'react-router-dom'
 import { Children, useState } from 'react'
 import { Container, Spacer } from '@nextui-org/react'
 
@@ -25,17 +24,15 @@ export function Layout({ children }: Props) {
   if (!menuItems) return null
 
   return (
-    <BrowserRouter>
+    <>
       <Menu
         items={menuItems}
         value={currentIndex}
         onChange={(index) => setCurrentIndex(index)}
       />
-      <Container xs>
-        <Spacer y={2} />
-        {Children.toArray(children)[currentIndex]}
-      </Container>
-    </BrowserRouter>
+      <Spacer y={2} />
+      {Children.toArray(children)[currentIndex]}
+    </>
   )
 }
 
