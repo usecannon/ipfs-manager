@@ -1,14 +1,17 @@
 import { Input as InputElement } from '@nextui-org/react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   name: string
   value: string
-  label: string
+  label?: string
+  labelLeft?: string
   onChange?: (val: string) => void
   placeholder?: string
   valid?: boolean
   readOnly?: boolean
   required?: boolean
+  contentRight?: React.ReactNode
 }
 
 export function Input({
@@ -16,22 +19,26 @@ export function Input({
   value,
   placeholder,
   label,
+  labelLeft,
   onChange,
   valid = true,
   readOnly,
   required,
+  contentRight,
 }: Props) {
   return (
     <InputElement
       name={name}
-      value={value}
+      initialValue={value}
       label={label}
+      labelLeft={labelLeft}
       placeholder={placeholder}
       onChange={(evt) => onChange && onChange(evt.target.value)}
       color={valid ? 'default' : 'error'}
       status={valid ? 'default' : 'error'}
       required={required}
       readOnly={readOnly}
+      contentRight={contentRight}
       fullWidth
     />
   )

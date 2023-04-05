@@ -1,4 +1,4 @@
-import { Button, Container, Spacer } from '@nextui-org/react'
+import { Button, Container, Link, Loading, Spacer } from '@nextui-org/react'
 import { useEffect, useState } from 'react'
 
 import { HistoryItem } from './History'
@@ -12,16 +12,13 @@ export default function Upload() {
 
   const [ipfsUploadUrl, setIpfsUploadUrl] = useState('http://localhost:5001')
   const [content, setContent] = useState('')
-
-  const [ipfsDownloadUrl, setIpfsDownloadUrl] = useState('https://ipfs.io')
-  const [previewUrl, setPreviewUrl] = useState('')
-  const [previewContent, setPreviewContent] = useState('')
+  const [uploadedCid, setUploadedCid] = useState('')
 
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
-    downloadPreview()
-  }, [previewUrl])
+    setUploadedCid('')
+  }, [content])
 
   async function upload() {
     if (uploading) return
@@ -30,17 +27,10 @@ export default function Upload() {
     try {
       const hash = await writeIpfs(ipfsUploadUrl, content)
       await add({ id: hash, content })
-      setPreviewUrl(`ipfs://${hash}`)
+      setUploadedCid(hash)
     } finally {
       setUploading(false)
     }
-  }
-
-  async function downloadPreview() {
-    const hash = parseIpfsHash(previewUrl)
-    if (!hash) return setPreviewContent('')
-    const newContent = await readIpfs(ipfsDownloadUrl, hash)
-    setPreviewContent(newContent)
   }
 
   return (
@@ -48,8 +38,8 @@ export default function Upload() {
       <Input
         name="ipfsUrl"
         value={ipfsUploadUrl}
-        label={'IPFS Upload Url'}
-        placeholder={'Enter and ipfs url...'}
+        label="IPFS Upload Url"
+        placeholder="Enter an ipfs url..."
         onChange={setIpfsUploadUrl}
         required
       />
@@ -57,46 +47,25 @@ export default function Upload() {
       <Textarea
         name="content"
         value={content}
-        label={'File Content'}
-        placeholder={'Enter file content...'}
+        label="File Content"
+        placeholder="Enter file content..."
         onChange={setContent}
         required
       />
       <Spacer />
-      <Button
-        css={{ minWidth: '100%' }}
-        disabled={!ipfsUploadUrl || !content || uploading}
-        onPress={upload}
-      >
-        Upload
-      </Button>
-      <Spacer y={2} />
-      <Input
-        name="ipfsDownloadUrl"
-        value={ipfsDownloadUrl}
-        label={'IPFS Download Url'}
-        placeholder={'Enter and ipfs url...'}
-        onChange={setIpfsDownloadUrl}
-        required
-      />
-      <Spacer />
-      <Input
-        name="previewUrl"
-        value={previewUrl}
-        label={'Preview File'}
-        placeholder={'ipfs://Qm...'}
-        onChange={setPreviewUrl}
-        valid={!previewUrl || !!parseIpfsHash(previewUrl)}
-        required
-      />
-      <Spacer />
-      <Textarea
-        name="previewContent"
-        value={previewContent}
-        label={'Preview Content'}
-        readOnly
-        required
-      />
+      {uploadedCid ? (
+        <Button css={{ minWidth: '100%' }} light color="success">
+          <Link href={`/${uploadedCid}`}>Preview: ipfs://{uploadedCid}</Link>
+        </Button>
+      ) : (
+        <Button
+          css={{ minWidth: '100%' }}
+          disabled={!ipfsUploadUrl || !content || uploading}
+          onPress={upload}
+        >
+          {uploading ? <Loading color="currentColor" size="sm" /> : 'Upload'}
+        </Button>
+      )}
     </Container>
   )
 }

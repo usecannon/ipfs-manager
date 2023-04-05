@@ -1,12 +1,10 @@
-import { Container, Grid, Modal, Table, Text, Tooltip } from '@nextui-org/react'
+import { Container, Table, Text } from '@nextui-org/react'
+import { Link } from 'raviger'
 import { useState } from 'react'
 
 import { DeleteIcon } from '../components/DeleteIcon'
-import { EyeIcon } from '../components/EyeIcon'
 import { IconButton } from '../components/IconButton'
-import { Input } from '../components/Input'
 import { ItemBase, useItemsList } from '../utils/db'
-import { Textarea } from '../components/Textarea'
 
 export interface HistoryItem extends ItemBase {
   content: string
@@ -18,28 +16,6 @@ export default function History() {
 
   return (
     <Container sm>
-      <Modal
-        width="auto"
-        closeButton
-        aria-labelledby="modal-title"
-        open={!!itemShowing}
-        onClose={() => setItemShowing(null)}
-      >
-        <Modal.Body>
-          <Input
-            name="cid"
-            value={itemShowing?.id || ''}
-            label={'CID'}
-            readOnly
-          />
-          <Textarea
-            name="content"
-            value={itemShowing?.content || ''}
-            label={'Content'}
-            readOnly
-          />
-        </Modal.Body>
-      </Modal>
       <Table
         aria-label="List of all the files uploaded to IPFS"
         css={{ height: 'auto', minWidth: '100%' }}
@@ -58,18 +34,13 @@ export default function History() {
               </Table.Cell>
               <Table.Cell>
                 <Text size={14} css={{ fontFamily: 'monospace' }}>
-                  <Text b>{item.id}</Text>
+                  <Link href={`/${item.id}`}>ipfs://{item.id}</Link>
                 </Text>
               </Table.Cell>
               <Table.Cell>
-                <Grid.Container gap={2} justify="space-around">
-                  <IconButton onClick={() => setItemShowing(item)}>
-                    <EyeIcon size={20} fill="#979797" />
-                  </IconButton>
-                  <IconButton onClick={() => del(item.id)}>
-                    <DeleteIcon size={20} fill="#FF0080" />
-                  </IconButton>
-                </Grid.Container>
+                <IconButton onClick={() => del(item.id)}>
+                  <DeleteIcon size={20} fill="#FF0080" />
+                </IconButton>
               </Table.Cell>
             </Table.Row>
           ))}
