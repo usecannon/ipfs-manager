@@ -1,16 +1,16 @@
 import { NextUIProvider, Spacer } from '@nextui-org/react'
 import { navigate, useMatch, useRoutes } from 'raviger'
 
-import Download from './pages/Download'
 import History from './pages/History'
 import Upload from './pages/Upload'
+import View from './pages/View'
 import { Menu } from './components/Menu'
 
 const pages = {
-  '/': () => <Download />,
+  '/': () => <View />,
   '/upload': () => <Upload />,
   '/history': () => <History />,
-  '/:cid': ({ cid }: { cid: string }) => <Download cid={cid} />,
+  '/:cid': ({ cid }: { cid: string }) => <View cid={cid} />,
 }
 
 const titles = [{ title: 'View' }, { title: 'Upload' }, { title: 'History' }]

@@ -25,7 +25,7 @@ const FORMAT = {
   json: 'JSON',
 } as const
 
-export default function Download({ cid = '' }: Props) {
+export default function View({ cid = '' }: Props) {
   const [ipfsGatewayUrl, setIpfsGatewayUrl] = useState('https://ipfs.io')
   const [fileUrl, setFileUrl] = useState(cid)
   const [content, setContent] = useState('')
