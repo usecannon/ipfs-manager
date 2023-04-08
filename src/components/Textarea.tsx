@@ -3,7 +3,8 @@ import { Textarea as TextareaElement } from '@nextui-org/react'
 interface Props {
   name: string
   value: string
-  label: string
+  label?: string
+  ariaLabel?: string
   placeholder?: string
   onChange?: (val: string) => void
   readOnly?: boolean
@@ -16,6 +17,7 @@ export function Textarea({
   value,
   placeholder,
   label,
+  ariaLabel,
   onChange,
   required,
   readOnly = false,
@@ -25,6 +27,7 @@ export function Textarea({
     <TextareaElement
       name={name}
       initialValue={value}
+      aria-label={ariaLabel}
       label={label}
       placeholder={placeholder}
       onChange={(evt) => onChange && onChange(evt.target.value)}

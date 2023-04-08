@@ -65,18 +65,18 @@ export default function Upload() {
         Compress (zlib)
       </Checkbox>
       <Spacer />
-      {uploadedCid ? (
-        <Button light color="success">
-          <Link href={`/${uploadedCid}`}>← Preview: ipfs://{uploadedCid}</Link>
-        </Button>
-      ) : (
-        <Button
-          css={{ minWidth: '100%' }}
-          disabled={!ipfsUploadUrl || !content || uploading}
-          onPress={upload}
-        >
-          {uploading ? <Loading color="currentColor" size="xs" /> : 'Upload'}
-        </Button>
+      <Button
+        css={{ minWidth: '100%' }}
+        disabled={!ipfsUploadUrl || !content || uploading || !!uploadedCid}
+        onPress={upload}
+      >
+        {uploading ? <Loading color="currentColor" size="xs" /> : 'Upload'}
+      </Button>
+      <Spacer y={0.5} />
+      {uploadedCid && (
+        <Link color="primary" href={`/${uploadedCid}`}>
+          ← Preview: ipfs://{uploadedCid}
+        </Link>
       )}
     </Container>
   )
