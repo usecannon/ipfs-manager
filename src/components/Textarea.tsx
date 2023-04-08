@@ -8,6 +8,7 @@ interface Props {
   onChange?: (val: string) => void
   readOnly?: boolean
   required?: boolean
+  valid?: boolean
 }
 
 export function Textarea({
@@ -18,16 +19,20 @@ export function Textarea({
   onChange,
   required,
   readOnly = false,
+  valid = true,
 }: Props) {
   return (
     <TextareaElement
       name={name}
-      value={value}
+      initialValue={value}
       label={label}
       placeholder={placeholder}
       onChange={(evt) => onChange && onChange(evt.target.value)}
       required={required}
       readOnly={readOnly}
+      color={valid ? 'default' : 'error'}
+      status={valid ? 'default' : 'error'}
+      animated={false}
       fullWidth
     />
   )

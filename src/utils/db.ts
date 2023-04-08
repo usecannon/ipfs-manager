@@ -21,7 +21,7 @@ export function useDb<T extends ItemBase>(listName: string) {
     }
     open()
     return () => {
-      client.close()
+      if (client.status === 'open') client.close()
     }
   }, [listName])
 

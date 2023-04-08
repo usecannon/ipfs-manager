@@ -1,5 +1,4 @@
 import { Input as InputElement } from '@nextui-org/react'
-import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   name: string
@@ -39,6 +38,7 @@ export function Input({
       required={required}
       readOnly={readOnly}
       contentRight={contentRight}
+      animated={false}
       fullWidth
     />
   )

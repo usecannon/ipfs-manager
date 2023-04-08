@@ -2,7 +2,7 @@ const headers = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
   'Access-Control-Allow-Headers':
-    'X-Requested-With, content-type, Authorization',
+    'X-Requested-With, content-type, Authorization, Content-Encoding',
 }
 
 module.exports = function (app) {

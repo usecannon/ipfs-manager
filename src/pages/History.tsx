@@ -1,6 +1,5 @@
 import { Container, Table, Text } from '@nextui-org/react'
 import { Link } from 'raviger'
-import { useState } from 'react'
 
 import { DeleteIcon } from '../components/DeleteIcon'
 import { IconButton } from '../components/IconButton'
@@ -12,7 +11,6 @@ export interface HistoryItem extends ItemBase {
 
 export default function History() {
   const { del, items } = useItemsList<HistoryItem>('upload-history')
-  const [itemShowing, setItemShowing] = useState<HistoryItem | null>(null)
 
   return (
     <Container sm>

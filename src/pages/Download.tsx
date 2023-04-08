@@ -1,4 +1,4 @@
-import { Container, Loading, Spacer } from '@nextui-org/react'
+import { Checkbox, Container, Loading, Spacer } from '@nextui-org/react'
 import { navigate } from 'raviger'
 import { useEffect, useState } from 'react'
 
@@ -14,7 +14,9 @@ export default function Download({ cid = '' }: Props) {
   const [ipfsGatewayUrl, setIpfsGatewayUrl] = useState('https://ipfs.io')
   const [fileUrl, setFileUrl] = useState(cid)
   const [content, setContent] = useState('')
+  const [error, setError] = useState('')
   const [downloading, setDownloading] = useState(false)
+  const [decompress, setDecompress] = useState(false)
 
   useEffect(() => {
     const parsedHash = parseIpfsHash(fileUrl)
@@ -24,15 +26,22 @@ export default function Download({ cid = '' }: Props) {
 
     async function downloadContent() {
       try {
+        setError('')
         setDownloading(true)
-        setContent(await readIpfs(ipfsGatewayUrl, parsedHash))
+        setContent(await readIpfs(ipfsGatewayUrl, parsedHash, { decompress }))
+      } catch (err) {
+        setError(
+          typeof err === 'string'
+            ? err
+            : (err as Error)?.message || 'Unknown error'
+        )
       } finally {
         setDownloading(false)
       }
     }
 
     downloadContent()
-  }, [fileUrl])
+  }, [decompress, ipfsGatewayUrl, fileUrl])
 
   return (
     <Container xs>
@@ -56,11 +65,16 @@ export default function Download({ cid = '' }: Props) {
         required
         contentRight={downloading ? <Loading size="xs" /> : null}
       />
+      <Spacer y={0.3} />
+      <Checkbox size="xs" onChange={setDecompress}>
+        Decompress (zlib)
+      </Checkbox>
       <Spacer />
       <Textarea
         name="previewContent"
-        value={content}
+        value={error || content}
         label="Content"
+        valid={!error}
         readOnly
         required
       />

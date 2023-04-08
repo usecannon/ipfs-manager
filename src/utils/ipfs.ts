@@ -1,6 +1,5 @@
-import FormData from 'form-data'
 import axios from 'axios'
-import { Buffer } from 'buffer'
+import pako from 'pako'
 import { create as createUrl, parse as parseUrl } from 'simple-url'
 
 const FILE_URL_REGEX = /^(?:ipfs:\/\/|@ipfs:)?(?<cid>[a-zA-Z0-9]{46})$/
@@ -39,15 +38,19 @@ export function createIpfsUrl(base: string, pathname: string) {
   return { url: createUrl(uri), headers }
 }
 
-export async function writeIpfs(ipfsUrl: string, content: string) {
+export async function writeIpfs(
+  ipfsUrl: string,
+  content: string,
+  { compress = false } = {}
+) {
   if (!content) throw new Error('No content to upload')
 
-  const { url, headers } = createIpfsUrl(ipfsUrl, '/api/v0/add')
+  const data = compress ? new Blob([pako.deflate(content)]) : content
+
   const formData = new FormData()
-  const buff = Buffer.from(content)
+  formData.append('data', data)
 
-  formData.append('data', Buffer.from(buff))
-
+  const { url, headers } = createIpfsUrl(ipfsUrl, '/api/v0/add')
   const res = await axios.post(url, formData, { headers })
 
   console.log('uploaded', res.statusText, res.data.Hash)
@@ -55,14 +58,21 @@ export async function writeIpfs(ipfsUrl: string, content: string) {
   return res.data.Hash
 }
 
-export async function readIpfs(ipfsUrl: string, cid: string): Promise<any> {
+export async function readIpfs(
+  ipfsUrl: string,
+  cid: string,
+  { decompress = false } = {}
+) {
   const { url, headers } = createIpfsUrl(ipfsUrl, `/api/v0/cat?arg=${cid}`)
 
   const res = await axios.get(url, {
-    responseType: 'arraybuffer',
-    responseEncoding: 'application/octet-stream',
+    responseType: decompress ? 'arraybuffer' : 'text',
     headers,
   })
 
-  return Buffer.from(res.data).toString('utf8')
+  const data: string = decompress
+    ? pako.inflate(res.data, { to: 'string' })
+    : res.data
+
+  return data
 }

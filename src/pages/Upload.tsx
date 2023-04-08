@@ -1,11 +1,18 @@
-import { Button, Container, Link, Loading, Spacer } from '@nextui-org/react'
+import {
+  Button,
+  Checkbox,
+  Container,
+  Link,
+  Loading,
+  Spacer,
+} from '@nextui-org/react'
 import { useEffect, useState } from 'react'
 
 import { HistoryItem } from './History'
 import { Input } from '../components/Input'
 import { Textarea } from '../components/Textarea'
-import { parseIpfsHash, readIpfs, writeIpfs } from '../utils/ipfs'
 import { useItemsList } from '../utils/db'
+import { writeIpfs } from '../utils/ipfs'
 
 export default function Upload() {
   const { add } = useItemsList<HistoryItem>('upload-history')
@@ -13,19 +20,20 @@ export default function Upload() {
   const [ipfsUploadUrl, setIpfsUploadUrl] = useState('http://localhost:5001')
   const [content, setContent] = useState('')
   const [uploadedCid, setUploadedCid] = useState('')
+  const [compress, setCompress] = useState(false)
 
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     setUploadedCid('')
-  }, [content])
+  }, [compress, content])
 
   async function upload() {
     if (uploading) return
     setUploading(true)
 
     try {
-      const hash = await writeIpfs(ipfsUploadUrl, content)
+      const hash = await writeIpfs(ipfsUploadUrl, content, { compress })
       await add({ id: hash, content })
       setUploadedCid(hash)
     } finally {
@@ -52,10 +60,14 @@ export default function Upload() {
         onChange={setContent}
         required
       />
+      <Spacer y={0.3} />
+      <Checkbox size="xs" onChange={setCompress}>
+        Compress (zlib)
+      </Checkbox>
       <Spacer />
       {uploadedCid ? (
-        <Button css={{ minWidth: '100%' }} light color="success">
-          <Link href={`/${uploadedCid}`}>Preview: ipfs://{uploadedCid}</Link>
+        <Button light color="success">
+          <Link href={`/${uploadedCid}`}>← Preview: ipfs://{uploadedCid}</Link>
         </Button>
       ) : (
         <Button
@@ -63,7 +75,7 @@ export default function Upload() {
           disabled={!ipfsUploadUrl || !content || uploading}
           onPress={upload}
         >
-          {uploading ? <Loading color="currentColor" size="sm" /> : 'Upload'}
+          {uploading ? <Loading color="currentColor" size="xs" /> : 'Upload'}
         </Button>
       )}
     </Container>
