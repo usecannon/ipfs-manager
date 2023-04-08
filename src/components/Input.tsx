@@ -1,4 +1,5 @@
 import { Input as InputElement } from '@nextui-org/react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   name: string
@@ -7,7 +8,8 @@ interface Props {
   labelLeft?: string
   onChange?: (val: string) => void
   placeholder?: string
-  valid?: boolean
+  validate?: (val: string) => boolean
+  parse?: (val: string) => string
   readOnly?: boolean
   required?: boolean
   contentRight?: React.ReactNode
@@ -20,11 +22,26 @@ export function Input({
   label,
   labelLeft,
   onChange,
-  valid = true,
+  validate = () => true,
+  parse = (val) => val,
   readOnly,
   required,
   contentRight,
 }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [currentValue, setValue] = useState(value)
+  const [valid, setValid] = useState(validate(value))
+
+  useEffect(() => {
+    const parsedValue = parse(currentValue)
+    setValid(validate(parsedValue))
+    if (onChange) onChange(parsedValue)
+
+    if (parsedValue !== currentValue && inputRef.current) {
+      inputRef.current.value = parsedValue
+    }
+  }, [currentValue])
+
   return (
     <InputElement
       name={name}
@@ -32,7 +49,7 @@ export function Input({
       label={label}
       labelLeft={labelLeft}
       placeholder={placeholder}
-      onChange={(evt) => onChange && onChange(evt.target.value)}
+      onChange={(evt) => setValue(evt.target.value)}
       color={valid ? 'default' : 'error'}
       status={valid ? 'default' : 'error'}
       required={required}
@@ -40,6 +57,7 @@ export function Input({
       contentRight={contentRight}
       animated={false}
       fullWidth
+      ref={inputRef}
     />
   )
 }

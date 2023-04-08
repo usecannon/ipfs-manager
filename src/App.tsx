@@ -5,6 +5,7 @@ import History from './pages/History'
 import Upload from './pages/Upload'
 import View from './pages/View'
 import { Menu } from './components/Menu'
+import { StoreProvider } from './store'
 
 const pages = {
   '/': () => <View />,
@@ -42,13 +43,15 @@ export function App() {
 
   return (
     <NextUIProvider>
-      <Menu
-        items={titles}
-        value={titleIndex}
-        onChange={(index) => navigate(getPath(index))}
-      />
-      <Spacer />
-      {route}
+      <StoreProvider>
+        <Menu
+          items={titles}
+          value={titleIndex}
+          onChange={(index) => navigate(getPath(index))}
+        />
+        <Spacer />
+        {route}
+      </StoreProvider>
     </NextUIProvider>
   )
 }

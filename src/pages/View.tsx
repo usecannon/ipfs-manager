@@ -13,54 +13,48 @@ import { navigate } from 'raviger'
 import { useEffect, useState } from 'react'
 
 import { Input } from '../components/Input'
+import { State, useStore } from '../store'
 import { Textarea } from '../components/Textarea'
-import { parseIpfsHash, readIpfs, writeIpfs } from '../utils/ipfs'
+import { parseIpfsHash, readIpfs } from '../utils/ipfs'
 
-interface Props {
-  cid?: string
-}
-
-const FORMAT = {
+const FORMAT_LABEL = {
   text: 'Text',
   json: 'JSON',
-} as const
+} satisfies { [K in State['format']]: string }
 
-export default function View({ cid = '' }: Props) {
-  const [ipfsGatewayUrl, setIpfsGatewayUrl] = useState('https://ipfs.io')
-  const [fileUrl, setFileUrl] = useState(cid)
-  const [content, setContent] = useState('')
+export default function View() {
+  const { state, set } = useStore()
+
   const [jsonContent, setJsonContent] = useState<unknown>(null)
   const [error, setError] = useState('')
   const [downloading, setDownloading] = useState(false)
-  const [decompress, setDecompress] = useState(false)
-  const [format, setFormat] = useState<keyof typeof FORMAT>('text')
 
   useEffect(() => {
-    if (format !== 'json') {
+    if (state.format !== 'json') {
       if (error === 'Could not parse JSON content') setError('')
       return setJsonContent('')
     }
 
     try {
-      setJsonContent(JSON.parse(content || '""'))
+      setJsonContent(JSON.parse(state.content || '""'))
       setError('')
     } catch (err) {
       setJsonContent('')
       setError('Could not parse JSON content')
     }
-  }, [format, content])
+  }, [state.format, state.content])
 
   useEffect(() => {
-    const parsedHash = parseIpfsHash(fileUrl)
-    if (parsedHash && cid !== parsedHash) navigate(`/${parsedHash}`)
-    if (!parsedHash) return setContent('')
-    if (parsedHash !== fileUrl) return setFileUrl(parsedHash)
+    if (!state.cid || !state.ipfsGateway) return set({ content: '' })
 
     async function downloadContent() {
       try {
         setError('')
         setDownloading(true)
-        setContent(await readIpfs(ipfsGatewayUrl, parsedHash, { decompress }))
+        const newContent = await readIpfs(state.ipfsGateway, state.cid, {
+          decompress: state.compression,
+        })
+        set({ content: newContent })
       } catch (err) {
         setError(
           typeof err === 'string'
@@ -73,33 +67,38 @@ export default function View({ cid = '' }: Props) {
     }
 
     downloadContent()
-  }, [decompress, ipfsGatewayUrl, fileUrl])
+  }, [state.ipfsGateway, state.cid, state.compression])
 
   return (
     <>
       <Container xs>
         <Input
           name="ipfsGatewayUrl"
-          value={ipfsGatewayUrl}
+          value={state.ipfsGateway}
           label="IPFS Gateway"
           placeholder="Enter an ipfs url..."
-          onChange={setIpfsGatewayUrl}
+          onChange={(ipfsGateway) => set({ ipfsGateway })}
           required
         />
         <Spacer />
         <Input
           name="cid"
-          value={cid}
+          value={state.cid}
           label="CID"
           labelLeft="ipfs://"
           placeholder="Qm..."
-          onChange={setFileUrl}
-          valid={!fileUrl || !!parseIpfsHash(fileUrl)}
+          onChange={(url) => set({ cid: parseIpfsHash(url) })}
+          validate={(url) => !url || !!parseIpfsHash(url)}
+          parse={(url) => parseIpfsHash(url) || url}
           required
           contentRight={downloading ? <Loading size="xs" /> : null}
         />
         <Spacer y={0.3} />
-        <Checkbox size="xs" onChange={setDecompress}>
+        <Checkbox
+          size="xs"
+          isSelected={state.compression}
+          onChange={(compression) => set({ compression })}
+        >
           Decompress (zlib)
         </Checkbox>
         <Spacer />
@@ -119,36 +118,38 @@ export default function View({ cid = '' }: Props) {
           </Grid>
           <Grid>
             <Dropdown>
-              <Dropdown.Button light>{FORMAT[format]}</Dropdown.Button>
+              <Dropdown.Button light>
+                {FORMAT_LABEL[state.format]}
+              </Dropdown.Button>
               <Dropdown.Menu
                 variant="light"
                 selectionMode="single"
                 aria-label="Format"
                 disallowEmptySelection
-                selectedKeys={[format]}
+                selectedKeys={[state.format]}
                 onSelectionChange={(val) =>
-                  setFormat(Array.from(val)[0] as keyof typeof FORMAT)
+                  set({ format: Array.from(val)[0] as State['format'] })
                 }
               >
-                {Object.entries(FORMAT).map(([name, title]) => (
+                {Object.entries(FORMAT_LABEL).map(([name, title]) => (
                   <Dropdown.Item key={name}>{title}</Dropdown.Item>
                 ))}
               </Dropdown.Menu>
             </Dropdown>
           </Grid>
         </Grid.Container>
-        {(format !== 'json' || !jsonContent) && (
+        {(state.format !== 'json' || !jsonContent) && (
           <Textarea
             ariaLabel="Content"
             name="content"
-            value={error || content}
+            value={error || state.content}
             valid={!error}
             readOnly
             required
           />
         )}
       </Container>
-      {format === 'json' && jsonContent && (
+      {state.format === 'json' && jsonContent && (
         <Container sm>
           <Spacer y={0.5} />
           <Card>
