@@ -38,7 +38,7 @@ export default function Download({ cid = '' }: Props) {
   useEffect(() => {
     if (format !== 'json') return setJsonContent('')
     try {
-      setJsonContent(JSON.parse(content))
+      setJsonContent(JSON.parse(content || '""'))
       setError('')
     } catch (err) {
       setJsonContent('')
