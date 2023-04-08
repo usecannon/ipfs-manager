@@ -36,7 +36,11 @@ export default function Download({ cid = '' }: Props) {
   const [format, setFormat] = useState<keyof typeof FORMAT>('text')
 
   useEffect(() => {
-    if (format !== 'json') return setJsonContent('')
+    if (format !== 'json') {
+      if (error === 'Could not parse JSON content') setError('')
+      return setJsonContent('')
+    }
+
     try {
       setJsonContent(JSON.parse(content || '""'))
       setError('')
