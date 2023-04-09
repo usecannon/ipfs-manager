@@ -1,57 +1,68 @@
 import { NextUIProvider, Spacer } from '@nextui-org/react'
-import { navigate, useMatch, useRoutes } from 'raviger'
+import { useEffect, useState } from 'react'
 
-import History from './pages/History'
-import Upload from './pages/Upload'
-import View from './pages/View'
+import { History } from './pages/History'
 import { Menu } from './components/Menu'
-import { StoreProvider } from './store'
+import { RouterProvider, useRouter } from './routes'
+import { StoreProvider, useActions, useStore } from './store'
+import { Upload } from './pages/Upload'
+import { View } from './pages/View'
 
-const pages = {
-  '/': () => <View />,
-  '/upload': () => <Upload />,
-  '/history': () => <History />,
-  '/:cid': ({ cid }: { cid: string }) => <View cid={cid} />,
-}
-
-const titles = [{ title: 'View' }, { title: 'Upload' }, { title: 'History' }]
-
-const titleIndex = {
-  '/': 0,
-  '/upload': 1,
-  '/history': 2,
-  '/:cid': 0,
-}
-
-function useTitleIndex() {
-  let index = -1
-  for (const [path, i] of Object.entries(titleIndex)) {
-    if (useMatch(path) && index === -1) index = i
-  }
-  return index
-}
-
-function getPath(index: number) {
-  return Object.entries(titleIndex).find(([, i]) => i === index)?.[0] || '/'
-}
-
-export function App() {
-  const route = useRoutes(pages)
-  const titleIndex = useTitleIndex()
-
-  if (!route) return <p>Page Not Found</p>
-
+function BaseProvider({ children }: { children: React.ReactNode }) {
   return (
     <NextUIProvider>
-      <StoreProvider>
-        <Menu
-          items={titles}
-          value={titleIndex}
-          onChange={(index) => navigate(getPath(index))}
-        />
-        <Spacer />
-        {route}
-      </StoreProvider>
+      <RouterProvider>{children}</RouterProvider>
     </NextUIProvider>
   )
 }
+
+export function App() {
+  const { page, params } = useRouter()
+
+  return (
+    <BaseProvider>
+      <StoreProvider initialState={{ page, ...params }}>
+        <Content />
+      </StoreProvider>
+    </BaseProvider>
+  )
+}
+
+function Content() {
+  const state = useStore()
+  const { set } = useActions()
+  const { page, params, navigate } = useRouter()
+
+  useEffect(() => {
+    set({ page, ...params })
+  }, [])
+
+  useEffect(() => {
+    if (state.page === 'view') {
+      const replace = state.page === page
+      navigate(`/${state.cid}`, { replace })
+    } else {
+      navigate(`/${state.page}`)
+    }
+  }, [state.page])
+
+  useEffect(() => {
+    if (state.page === 'view') {
+      navigate(`/${state.cid}`, { replace: true })
+    }
+  }, [state.cid])
+
+  if (state.page === '404') return <p>Page Not Found</p>
+
+  return (
+    <>
+      <Menu />
+      <Spacer />
+      {state.page === 'view' && <View />}
+      {state.page === 'upload' && <Upload />}
+      {state.page === 'history' && <History />}
+    </>
+  )
+}
+
+export { useRouter }

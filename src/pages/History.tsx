@@ -1,15 +1,14 @@
-import { Container, Table, Text } from '@nextui-org/react'
-import { Link } from 'raviger'
+import { Container, Link, Table, Text } from '@nextui-org/react'
 
 import { DeleteIcon } from '../components/DeleteIcon'
 import { IconButton } from '../components/IconButton'
 import { ItemBase, useItemsList } from '../utils/db'
+import { useActions } from '../store'
 
-export interface HistoryItem extends ItemBase {
-  content: string
-}
+export interface HistoryItem extends ItemBase {}
 
-export default function History() {
+export function History() {
+  const { view } = useActions()
   const { del, items } = useItemsList<HistoryItem>('upload-history')
 
   return (
@@ -32,7 +31,9 @@ export default function History() {
               </Table.Cell>
               <Table.Cell>
                 <Text size={14} css={{ fontFamily: 'monospace' }}>
-                  <Link href={`/${item.id}`}>ipfs://{item.id}</Link>
+                  <Link color="primary" onPress={() => view(item.id)}>
+                    ipfs://{item.id}
+                  </Link>
                 </Text>
               </Table.Cell>
               <Table.Cell>

@@ -1,53 +1,82 @@
-import { createContext, useContext, useReducer } from 'react'
+import rfdc from 'rfdc'
+import { createContext, useContext, useState } from 'react'
 
-const SET_STATE = '$$_SET_STATE'
+const clone = rfdc()
 
-type SetAction<State> = { type: typeof SET_STATE; payload: Partial<State> }
+type BaseState = { [key: string]: any }
+type BaseActions<State> = {
+  [name: string]: (state: State, ...params: any[]) => State
+}
 
-export function createStore<State, Action = { type: 'noop' }>(
-  initialState: State,
-  reducer?: (state: State, action: Action) => State
-) {
-  function baseReducer(state: State, action: Action & SetAction<State>) {
-    switch (action.type) {
-      case SET_STATE:
-        return { ...state, ...action.payload }
-      default:
-        return reducer ? reducer(state, action) : state
-    }
-  }
-
-  type Context = {
+export function createStore<
+  State extends BaseState,
+  Actions extends BaseActions<State>
+>(initialState: State, actions: Actions) {
+  interface Context {
     state: State
-    dispatch: (action: Action) => void
-    set: (payload: Partial<State>) => void
+    setState: (state: State) => void
   }
 
-  const StoreContext = createContext<Context | null>(null)
+  const StoreContext = createContext<Context>({
+    state: initialState,
+    setState: () => {
+      throw new Error('Context not initialized')
+    },
+  })
 
   function useStore() {
-    return useContext(StoreContext)!
+    const { state } = useContext(StoreContext)
+    return clone(state)
   }
 
-  function StoreProvider({ children }: { children: React.ReactNode }) {
-    const [state, baseDispatch] = useReducer(
-      baseReducer,
-      initialState,
-      (state) => ({ ...state })
-    )
+  function useActions() {
+    const { state, setState } = useContext(StoreContext)
 
-    function set(payload: Partial<State>) {
-      return baseDispatch({ type: SET_STATE, payload })
+    type Result = {
+      [K in keyof Actions]: Parameters<Actions[K]>[1] extends undefined
+        ? () => void
+        : Parameters<Actions[K]>[2] extends undefined
+        ? (param: Parameters<Actions[K]>[1]) => void
+        : (
+            param1: Parameters<Actions[K]>[1],
+            param2?: Parameters<Actions[K]>[2]
+          ) => void
     }
 
-    const dispatch = (action: Action) => baseDispatch(action)
+    const result: any = {}
+    const keys = Object.keys(actions) as (keyof Actions)[]
+
+    for (const key of keys) {
+      const action = actions[key]
+      result[key] = (
+        param1: Parameters<typeof action>[1],
+        param2?: Parameters<typeof action>[2]
+      ) => {
+        setState(action(state as State, param1, param2) as State)
+      }
+    }
+
+    return result as Result
+  }
+
+  function StoreProvider({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode
+    initialState?: Partial<State>
+  }) {
+    const [state, setState] = useState({
+      ...initialState,
+      ...props.initialState,
+    })
 
     return (
-      <StoreContext.Provider value={{ state, dispatch, set }}>
+      <StoreContext.Provider value={{ state, setState }}>
         {children}
       </StoreContext.Provider>
     )
   }
 
-  return { StoreProvider, useStore }
+  return { StoreProvider, useStore, useActions }
 }

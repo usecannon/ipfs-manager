@@ -11,13 +11,14 @@ import { useState } from 'react'
 import { HistoryItem } from './History'
 import { Input } from '../components/Input'
 import { Textarea } from '../components/Textarea'
+import { useActions, useStore } from '../store'
 import { useItemsList } from '../utils/db'
-import { useStore } from '../store'
 import { writeIpfs } from '../utils/ipfs'
 
-export default function Upload() {
+export function Upload() {
   const { add } = useItemsList<HistoryItem>('upload-history')
-  const { state, set } = useStore()
+  const state = useStore()
+  const { set, view } = useActions()
 
   const [uploading, setUploading] = useState(false)
 
@@ -29,7 +30,7 @@ export default function Upload() {
       const cid = await writeIpfs(state.ipfsApi, state.content, {
         compress: state.compression,
       })
-      await add({ id: cid, content: state.content })
+      await add({ id: cid })
       set({ cid })
     } finally {
       setUploading(false)
@@ -73,7 +74,7 @@ export default function Upload() {
       </Button>
       <Spacer y={0.5} />
       {state.cid && (
-        <Link color="primary" href={`/${state.cid}`}>
+        <Link color="primary" onPress={() => view(state.cid)}>
           ← Preview: ipfs://{state.cid}
         </Link>
       )}

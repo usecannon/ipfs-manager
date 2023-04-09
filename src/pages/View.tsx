@@ -9,11 +9,10 @@ import {
   Spacer,
   Text,
 } from '@nextui-org/react'
-import { navigate } from 'raviger'
 import { useEffect, useState } from 'react'
 
 import { Input } from '../components/Input'
-import { State, useStore } from '../store'
+import { State, useActions, useStore } from '../store'
 import { Textarea } from '../components/Textarea'
 import { parseIpfsHash, readIpfs } from '../utils/ipfs'
 
@@ -22,8 +21,9 @@ const FORMAT_LABEL = {
   json: 'JSON',
 } satisfies { [K in State['format']]: string }
 
-export default function View() {
-  const { state, set } = useStore()
+export function View() {
+  const state = useStore()
+  const { set } = useActions()
 
   const [jsonContent, setJsonContent] = useState<unknown>(null)
   const [error, setError] = useState('')
