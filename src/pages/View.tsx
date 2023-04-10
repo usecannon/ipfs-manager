@@ -47,9 +47,11 @@ export function View() {
   useEffect(() => {
     if (!state.cid || !state.ipfsGateway) return set({ content: '' })
 
+    setError('')
+    set({ content: '' })
+
     async function downloadContent() {
       try {
-        setError('')
         setDownloading(true)
         const newContent = await readIpfs(state.ipfsGateway, state.cid, {
           decompress: state.compression,
@@ -67,6 +69,10 @@ export function View() {
     }
 
     downloadContent()
+
+    return () => {
+      setDownloading(false)
+    }
   }, [state.ipfsGateway, state.cid, state.compression])
 
   return (

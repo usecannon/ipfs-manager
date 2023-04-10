@@ -1,10 +1,11 @@
+import qs from 'qs'
 import { NextUIProvider, Spacer } from '@nextui-org/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
+import { Format, StoreProvider, useStore } from './store'
 import { History } from './pages/History'
 import { Menu } from './components/Menu'
 import { RouterProvider, useRouter } from './routes'
-import { StoreProvider, useActions, useStore } from './store'
 import { Upload } from './pages/Upload'
 import { View } from './pages/View'
 
@@ -17,11 +18,20 @@ function BaseProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function App() {
-  const { page, params } = useRouter()
+  const { page, params, query } = useRouter()
 
   return (
     <BaseProvider>
-      <StoreProvider initialState={{ page, ...params }}>
+      <StoreProvider
+        initialState={{
+          page,
+          compression: query.compression ? true : false,
+          format: Object.values(Format).includes(query.format as Format)
+            ? (query.format as Format)
+            : Format.Text,
+          ...params,
+        }}
+      >
         <Content />
       </StoreProvider>
     </BaseProvider>
@@ -30,25 +40,38 @@ export function App() {
 
 function Content() {
   const state = useStore()
-  const { set } = useActions()
-  const { page, params, navigate } = useRouter()
+  const router = useRouter()
+
+  function _getQuery() {
+    if (!['view', 'upload'].includes(state.page)) return ''
+    const query: { compression?: 'true'; format?: Format } = {}
+    if (state.compression) query.compression = 'true'
+    if (state.format !== Format.Text) query.format = state.format
+    if (Object.keys(query).length === 0) return ''
+    return `?${qs.stringify(query)}`
+  }
 
   useEffect(() => {
-    set({ page, ...params })
-  }, [])
-
-  useEffect(() => {
+    console.log()
     if (state.page === 'view') {
-      const replace = state.page === page
-      navigate(`/${state.cid}`, { replace })
+      const replace = state.page === router.page
+      router.navigate(`/${state.cid}${_getQuery()}`, { replace })
+    } else if (state.page === 'upload') {
+      router.navigate(`/${state.page}${_getQuery()}`)
     } else {
-      navigate(`/${state.page}`)
+      router.navigate(`/${state.page}`)
     }
   }, [state.page])
 
   useEffect(() => {
+    router.navigate(`${window.location.pathname}${_getQuery()}`, {
+      replace: true,
+    })
+  }, [state.compression, state.format])
+
+  useEffect(() => {
     if (state.page === 'view') {
-      navigate(`/${state.cid}`, { replace: true })
+      router.navigate(`/${state.cid}${_getQuery()}`, { replace: true })
     }
   }, [state.cid])
 

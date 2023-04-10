@@ -1,5 +1,10 @@
 import { createStore } from './utils/create-store'
 
+export enum Format {
+  Text = 'text',
+  JSON = 'json',
+}
+
 export interface State {
   page: 'view' | 'upload' | 'history' | '404'
   ipfsGateway: string
@@ -7,7 +12,7 @@ export interface State {
   cid: string
   content: string
   compression: boolean
-  format: 'text' | 'json'
+  format: Format
 }
 
 const initialState = {
@@ -17,7 +22,7 @@ const initialState = {
   cid: '',
   content: '',
   compression: false,
-  format: 'text',
+  format: Format.Text,
 } satisfies State
 
 const actions = {

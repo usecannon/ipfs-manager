@@ -1,23 +1,32 @@
 import UrlPattern from 'url-pattern'
+import qs from 'qs'
 import { createContext, useContext, useState } from 'react'
 
 type Pages = { [page: string]: string | string[] }
 
+interface Query {
+  [k: string]: boolean | string
+}
+
 interface Context<Pages> {
   page: keyof Pages | '404'
   params: { [param: string]: string }
+  query: Query
   navigate: (pathname: string, options?: { replace: boolean }) => void
 }
 
 export function createRouter<P extends Pages>(pages: P) {
   const routes = _parseRoutes(pages)
-  const initialMatch = matchRoute(window.location.pathname) as Context<P>
+  const initialMatch = _matchRoute(window.location.pathname) as Context<P>
+  const initialQuery = _parseQuery(window.location.search)
+
   const RouterContext = createContext<Context<P>>({
     ...initialMatch,
+    query: initialQuery,
     navigate: () => {},
   })
 
-  function matchRoute(pathname: string) {
+  function _matchRoute(pathname: string) {
     for (const route of routes) {
       const params = route.pattern.match(pathname)
       if (params) return { page: route.page, params }
@@ -29,16 +38,18 @@ export function createRouter<P extends Pages>(pages: P) {
   function RouterProvider({ children }: { children: React.ReactNode }) {
     const [page, setPage] = useState(initialMatch.page)
     const [params, setParams] = useState(initialMatch.params)
+    const [query, setQuery] = useState<Query>(initialQuery)
 
     function navigate(pathname: string, { replace = false } = {}) {
-      const match = matchRoute(pathname)
+      const match = _matchRoute(pathname)
       setPage(match.page)
       setParams(match.params)
+      setQuery(_parseQuery(pathname))
       window.history[replace ? 'replaceState' : 'pushState']({}, '', pathname)
     }
 
     return (
-      <RouterContext.Provider value={{ page, params, navigate }}>
+      <RouterContext.Provider value={{ page, params, query, navigate }}>
         {children}
       </RouterContext.Provider>
     )
@@ -67,4 +78,18 @@ function _parseRoutes<P extends Pages>(pages: P) {
 
 function _score(pathname: string) {
   return (pathname.match(/(\/|:)/g) || []).length
+}
+
+function _parseQuery(search: string) {
+  return Object.fromEntries(
+    Object.entries(qs.parse(search.replace(/^\?/, ''), { depth: 0 })).map(
+      ([k, v]) => [k, _parseQueryValue(v as string)]
+    )
+  )
+}
+
+function _parseQueryValue(value: string) {
+  if (value.toLowerCase() === 'true') return 'true'
+  if (value.toLowerCase() === 'false') return 'false'
+  return value
 }

@@ -14,6 +14,7 @@
   "devDependencies": {
     "@types/map-values": "^1.0.0",
     "@types/pako": "^2.0.0",
+    "@types/qs": "^6.9.7",
     "@types/react": "^18.0.31",
     "@types/react-dom": "^18.0.11"
   },
@@ -27,6 +28,7 @@
     "parcel": "^2.8.3",
     "parcel-reporter-static-files-copy": "^1.5.0",
     "process": "^0.11.10",
+    "qs": "^6.11.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-json-view": "^1.21.3",

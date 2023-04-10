@@ -9,6 +9,7 @@ const routes = {
   view: ['/', '/:cid'],
   upload: '/upload',
   history: '/history',
+  '404': '/404',
 } satisfies Routes
 
 const { RouterProvider, useRouter } = createRouter(routes)
