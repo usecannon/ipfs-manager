@@ -11,15 +11,10 @@ import {
 } from '@nextui-org/react'
 import { useEffect, useState } from 'react'
 
+import { Format, State, useActions, useStore } from '../store'
 import { Input } from '../components/Input'
-import { State, useActions, useStore } from '../store'
 import { Textarea } from '../components/Textarea'
 import { parseIpfsHash, readIpfs } from '../utils/ipfs'
-
-const FORMAT_LABEL = {
-  text: 'Text',
-  json: 'JSON',
-} satisfies { [K in State['format']]: string }
 
 export function View() {
   const state = useStore()
@@ -125,7 +120,7 @@ export function View() {
           <Grid>
             <Dropdown>
               <Dropdown.Button light>
-                {FORMAT_LABEL[state.format]}
+                {_formatTitle(state.format)}
               </Dropdown.Button>
               <Dropdown.Menu
                 variant="light"
@@ -137,8 +132,8 @@ export function View() {
                   set({ format: Array.from(val)[0] as State['format'] })
                 }
               >
-                {Object.entries(FORMAT_LABEL).map(([name, title]) => (
-                  <Dropdown.Item key={name}>{title}</Dropdown.Item>
+                {Object.entries(Format).map(([title, val]) => (
+                  <Dropdown.Item key={val}>{title}</Dropdown.Item>
                 ))}
               </Dropdown.Menu>
             </Dropdown>
@@ -168,4 +163,10 @@ export function View() {
       )}
     </>
   )
+}
+
+function _formatTitle(format: Format) {
+  for (const [key, value] of Object.entries(Format)) {
+    if (value === format) return key
+  }
 }

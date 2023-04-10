@@ -5,8 +5,15 @@ export enum Format {
   JSON = 'json',
 }
 
+export enum Page {
+  View = 'view',
+  Upload = 'upload',
+  History = 'history',
+  NotFound = '404',
+}
+
 export interface State {
-  page: 'view' | 'upload' | 'history' | '404'
+  page: Page
   ipfsGateway: string
   ipfsApi: string
   cid: string
@@ -16,7 +23,7 @@ export interface State {
 }
 
 const initialState = {
-  page: 'view',
+  page: Page.View,
   ipfsGateway: 'https://ipfs.io',
   ipfsApi: 'http://localhost:5001',
   cid: '',
@@ -26,19 +33,19 @@ const initialState = {
 } satisfies State
 
 const actions = {
-  set(state: State, payload: Partial<State>) {
+  set(state: State, payload: Partial<State>): State {
     return { ...state, ...payload }
   },
 
-  view(state: State, cid: string) {
-    if (state.cid === cid) return { ...state, page: 'view' }
+  view(state: State, cid: string): State {
+    if (state.cid === cid) return { ...state, page: Page.View }
     return {
       ...state,
-      page: 'view',
+      page: Page.View,
       cid,
       content: '',
       compression: false,
-      format: 'text',
+      format: Format.Text,
     }
   },
 } as const

@@ -2,7 +2,7 @@ import qs from 'qs'
 import { NextUIProvider, Spacer } from '@nextui-org/react'
 import { useEffect } from 'react'
 
-import { Format, StoreProvider, useStore } from './store'
+import { Format, Page, StoreProvider, useStore } from './store'
 import { History } from './pages/History'
 import { Menu } from './components/Menu'
 import { RouterProvider, useRouter } from './routes'
@@ -24,7 +24,7 @@ export function App() {
     <BaseProvider>
       <StoreProvider
         initialState={{
-          page,
+          page: page as Page,
           compression: query.compression ? true : false,
           format: Object.values(Format).includes(query.format as Format)
             ? (query.format as Format)
