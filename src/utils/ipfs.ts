@@ -1,3 +1,4 @@
+import FormData from 'form-data'
 import axios from 'axios'
 import pako from 'pako'
 import { create as createUrl, parse as parseUrl } from 'simple-url'
