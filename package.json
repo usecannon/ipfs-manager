@@ -1,8 +1,8 @@
 {
-  "name": "browser-ipfs-upload",
-  "version": "0.0.1",
+  "name": "ipfs-manager",
+  "version": "1.0.0",
   "description": "Simple UI example to upload custom content to IPFS",
-  "repository": "git@github.com:mjlescano/browser-ipfs-upload.git",
+  "repository": "git@github.com:usecannon/ipfs-manager.git",
   "author": "mjlescano",
   "license": "MIT",
   "private": true,
