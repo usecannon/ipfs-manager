@@ -1,17 +1,22 @@
-import { Input as InputElement } from '@nextui-org/react'
+import {
+  Input as InputElement,
+  InputGroup,
+  InputLeftAddon,
+  InputRightAddon,
+  Text,
+} from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   name: string
   value: string
   label?: string
-  labelLeft?: string
+  labelLeft?: React.ReactNode
   onChange?: (val: string) => void
   placeholder?: string
-  validate?: (val: string) => boolean
-  parse?: (val: string) => string
   readOnly?: boolean
   required?: boolean
+  isInvalid?: boolean
   contentRight?: React.ReactNode
 }
 
@@ -22,42 +27,27 @@ export function Input({
   label,
   labelLeft,
   onChange,
-  validate = () => true,
-  parse = (val) => val,
   readOnly,
   required,
+  isInvalid,
   contentRight,
 }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [currentValue, setValue] = useState(value)
-  const [valid, setValid] = useState(validate(value))
-
-  useEffect(() => {
-    const parsedValue = parse(currentValue)
-    setValid(validate(parsedValue))
-    if (onChange) onChange(parsedValue)
-
-    if (parsedValue !== currentValue && inputRef.current) {
-      inputRef.current.value = parsedValue
-    }
-  }, [currentValue])
-
   return (
-    <InputElement
-      name={name}
-      initialValue={value}
-      label={label}
-      labelLeft={labelLeft}
-      placeholder={placeholder}
-      onChange={(evt) => setValue(evt.target.value)}
-      color={valid ? 'default' : 'error'}
-      status={valid ? 'default' : 'error'}
-      required={required}
-      readOnly={readOnly}
-      contentRight={contentRight}
-      animated={false}
-      fullWidth
-      ref={inputRef}
-    />
+    <>
+      {label && <Text mb="8px">{label}</Text>}
+      <InputGroup>
+        {labelLeft && <InputLeftAddon children={labelLeft} />}
+        <InputElement
+          name={name}
+          value={value}
+          placeholder={placeholder}
+          onChange={(evt) => onChange && onChange(evt.target.value)}
+          required={required}
+          isDisabled={readOnly}
+          isInvalid={isInvalid}
+        />
+        {contentRight && <InputRightAddon children={contentRight} />}
+      </InputGroup>
+    </>
   )
 }

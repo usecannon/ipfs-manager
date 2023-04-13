@@ -1,34 +1,49 @@
-import { Navbar } from '@nextui-org/react'
-import { State, useActions, useStore } from '../store'
+import {
+  Text,
+  Flex,
+  Tab,
+  TabIndicator,
+  TabList,
+  Tabs,
+  Spacer,
+  Container,
+} from '@chakra-ui/react'
 
-const items = {
-  view: 'View',
-  upload: 'Upload',
-  history: 'History',
-} as const satisfies {
-  [K in Exclude<State['page'], '404'>]: string
-}
+import { Page, useActions, useStore } from '../store'
+
+const pages = ['view', 'upload', 'history'] as const satisfies readonly Page[]
+const titles = ['View', 'Upload', 'History'] as const
 
 export function Menu() {
   const state = useStore()
   const { set } = useActions()
 
   return (
-    <Navbar isCompact maxWidth="xs">
-      <Navbar.Content />
-      <Navbar.Content enableCursorHighlight variant={'underline'}>
-        {Object.entries(items).map(([page, title]) => (
-          <Navbar.Item
-            key={page}
-            isActive={page === state.page}
-            onClick={() => set({ page: page as State['page'] })}
-            css={{ cursor: 'pointer' }}
-          >
-            {title}
-          </Navbar.Item>
-        ))}
-      </Navbar.Content>
-      <Navbar.Content />
-    </Navbar>
+    <Container maxW="100%" w="container.sm" pr="0.4" paddingY={4}>
+      <Flex>
+        <Text fontSize="2xl">IPFS Manager</Text>
+        <Spacer />
+        <Tabs
+          position="relative"
+          variant="unstyled"
+          index={pages.findIndex((page) => page === state.page)}
+          onChange={(index) => set({ page: pages[index]! })}
+        >
+          <TabList>
+            {pages.map((page, index) => (
+              <Tab key={page} css={{ cursor: 'pointer' }}>
+                {titles[index]}
+              </Tab>
+            ))}
+          </TabList>
+          <TabIndicator
+            mt="-1.5px"
+            height="2px"
+            bg="blue.500"
+            borderRadius="1px"
+          />
+        </Tabs>
+      </Flex>
+    </Container>
   )
 }

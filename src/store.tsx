@@ -1,16 +1,10 @@
 import { createStore } from './utils/create-store'
 
-export enum Format {
-  Text = 'text',
-  JSON = 'json',
-}
+export const PAGE = ['view', 'upload', 'history', '404'] as const
+export const FORMAT = ['text', 'json'] as const
 
-export enum Page {
-  View = 'view',
-  Upload = 'upload',
-  History = 'history',
-  NotFound = '404',
-}
+export type Format = (typeof FORMAT)[number]
+export type Page = (typeof PAGE)[number]
 
 export interface State {
   page: Page
@@ -23,13 +17,13 @@ export interface State {
 }
 
 const initialState = {
-  page: Page.View,
+  page: 'view',
   ipfsGateway: 'https://ipfs.io',
   ipfsApi: 'http://localhost:5001',
   cid: '',
   content: '',
   compression: false,
-  format: Format.Text,
+  format: 'text',
 } satisfies State
 
 const actions = {
@@ -38,14 +32,14 @@ const actions = {
   },
 
   view(state: State, cid: string): State {
-    if (state.cid === cid) return { ...state, page: Page.View }
+    if (state.cid === cid) return { ...state, page: 'view' }
     return {
       ...state,
-      page: Page.View,
+      page: 'view',
       cid,
       content: '',
       compression: false,
-      format: Format.Text,
+      format: 'text',
     }
   },
 } as const

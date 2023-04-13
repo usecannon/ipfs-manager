@@ -1,4 +1,4 @@
-import { Textarea as TextareaElement } from '@nextui-org/react'
+import { Text, Textarea as TextareaElement } from '@chakra-ui/react'
 
 interface Props {
   name: string
@@ -24,19 +24,21 @@ export function Textarea({
   valid = true,
 }: Props) {
   return (
-    <TextareaElement
-      name={name}
-      initialValue={value}
-      aria-label={ariaLabel}
-      label={label}
-      placeholder={placeholder}
-      onChange={(evt) => onChange && onChange(evt.target.value)}
-      required={required}
-      readOnly={readOnly}
-      color={valid ? 'default' : 'error'}
-      status={valid ? 'default' : 'error'}
-      animated={false}
-      fullWidth
-    />
+    <>
+      {label && <Text mb="8px">{label}</Text>}
+      <TextareaElement
+        name={name}
+        value={value}
+        aria-label={ariaLabel}
+        placeholder={placeholder}
+        onChange={(evt) => onChange && onChange(evt.target.value)}
+        isRequired={required}
+        isReadOnly={readOnly}
+        isInvalid={!valid}
+        resize="vertical"
+        minH={250}
+        variant={readOnly ? 'filled' : 'outline'}
+      />
+    </>
   )
 }

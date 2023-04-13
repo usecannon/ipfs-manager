@@ -1,8 +1,8 @@
 import qs from 'qs'
-import { NextUIProvider, Spacer } from '@nextui-org/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import { useEffect } from 'react'
 
-import { Format, Page, StoreProvider, useStore } from './store'
+import { FORMAT, Format, Page, StoreProvider, useStore } from './store'
 import { History } from './pages/History'
 import { Menu } from './components/Menu'
 import { RouterProvider, useRouter } from './routes'
@@ -11,9 +11,9 @@ import { View } from './pages/View'
 
 function BaseProvider({ children }: { children: React.ReactNode }) {
   return (
-    <NextUIProvider>
+    <ChakraProvider>
       <RouterProvider>{children}</RouterProvider>
-    </NextUIProvider>
+    </ChakraProvider>
   )
 }
 
@@ -26,9 +26,9 @@ export function App() {
         initialState={{
           page: page as Page,
           compression: query.compression ? true : false,
-          format: Object.values(Format).includes(query.format as Format)
+          format: FORMAT.includes(query.format as Format)
             ? (query.format as Format)
-            : Format.Text,
+            : 'text',
           ...params,
         }}
       >
@@ -46,13 +46,12 @@ function Content() {
     if (!['view', 'upload'].includes(state.page)) return ''
     const query: { compression?: 'true'; format?: Format } = {}
     if (state.compression) query.compression = 'true'
-    if (state.format !== Format.Text) query.format = state.format
+    if (state.format !== 'text') query.format = state.format
     if (Object.keys(query).length === 0) return ''
     return `?${qs.stringify(query)}`
   }
 
   useEffect(() => {
-    console.log()
     if (state.page === 'view') {
       const replace = state.page === router.page
       router.navigate(`/${state.cid}${_getQuery()}`, { replace })
@@ -80,7 +79,6 @@ function Content() {
   return (
     <>
       <Menu />
-      <Spacer />
       {state.page === 'view' && <View />}
       {state.page === 'upload' && <Upload />}
       {state.page === 'history' && <History />}

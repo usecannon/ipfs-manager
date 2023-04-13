@@ -1,11 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Container,
-  Link,
-  Loading,
-  Spacer,
-} from '@nextui-org/react'
+import { Button, Checkbox, Container, Link } from '@chakra-ui/react'
 import { useState } from 'react'
 
 import { HistoryItem } from './History'
@@ -38,7 +31,7 @@ export function Upload() {
   }
 
   return (
-    <Container xs>
+    <Container maxW="100%" w="container.sm">
       <Input
         name="ipfsUrl"
         value={state.ipfsApi}
@@ -47,7 +40,6 @@ export function Upload() {
         onChange={(val) => set({ ipfsApi: val })}
         required
       />
-      <Spacer />
       <Textarea
         name="content"
         value={state.content}
@@ -56,25 +48,22 @@ export function Upload() {
         onChange={(content) => set({ cid: '', content })}
         required
       />
-      <Spacer y={0.3} />
       <Checkbox
-        size="xs"
-        isSelected={state.compression}
-        onChange={(compression) => set({ cid: '', compression })}
+        defaultChecked={state.compression}
+        onChange={(evt) => set({ cid: '', compression: evt.target.checked })}
       >
         Compress (zlib)
       </Checkbox>
-      <Spacer />
       <Button
-        css={{ minWidth: '100%' }}
+        width="100%"
+        isLoading={uploading}
         disabled={!state.ipfsApi || !state.content || uploading || !!state.cid}
-        onPress={upload}
+        onClick={upload}
       >
-        {uploading ? <Loading color="currentColor" size="xs" /> : 'Upload'}
+        Upload
       </Button>
-      <Spacer y={0.5} />
       {state.cid && (
-        <Link color="primary" onPress={() => view(state.cid)}>
+        <Link fontSize="sm" onClick={() => view(state.cid)}>
           ← Preview: ipfs://{state.cid}
         </Link>
       )}
