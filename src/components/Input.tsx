@@ -5,7 +5,6 @@ import {
   InputRightAddon,
   Text,
 } from '@chakra-ui/react'
-import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   name: string
@@ -34,7 +33,7 @@ export function Input({
 }: Props) {
   return (
     <>
-      {label && <Text mb="8px">{label}</Text>}
+      {label && <Text>{label}</Text>}
       <InputGroup>
         {labelLeft && <InputLeftAddon children={labelLeft} />}
         <InputElement

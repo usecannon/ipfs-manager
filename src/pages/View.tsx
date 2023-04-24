@@ -6,6 +6,7 @@ import { CIDInput } from '../components/CIDInput'
 import { FORMAT } from '../store'
 import { Format } from '../store'
 import { Input } from '../components/Input'
+import { Space } from '../components/Space'
 import { Textarea } from '../components/Textarea'
 import { readIpfs } from '../utils/ipfs'
 import { useActions, useStore } from '../store'
@@ -77,6 +78,7 @@ export function View() {
           onChange={(ipfsGateway) => set({ ipfsGateway })}
           required
         />
+        <Space />
         <CIDInput
           initialValue={state.cid}
           onChange={(cid) => set({ cid })}
@@ -88,6 +90,7 @@ export function View() {
         >
           Decompress (zlib)
         </Checkbox>
+        <Space />
         <Select
           value={state.format}
           onChange={(evt) => set({ format: evt.target.value as Format })}

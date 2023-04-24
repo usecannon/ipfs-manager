@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { HistoryItem } from './History'
 import { Input } from '../components/Input'
+import { Space } from '../components/Space'
 import { Textarea } from '../components/Textarea'
 import { useActions, useStore } from '../store'
 import { useItemsList } from '../utils/db'
@@ -40,6 +41,7 @@ export function Upload() {
         onChange={(val) => set({ ipfsApi: val })}
         required
       />
+      <Space />
       <Textarea
         name="content"
         value={state.content}
@@ -54,6 +56,7 @@ export function Upload() {
       >
         Compress (zlib)
       </Checkbox>
+      <Space />
       <Button
         width="100%"
         isLoading={uploading}
