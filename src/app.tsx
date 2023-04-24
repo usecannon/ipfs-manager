@@ -8,10 +8,11 @@ import { Menu } from './components/Menu'
 import { RouterProvider, useRouter } from './routes'
 import { Upload } from './pages/Upload'
 import { View } from './pages/View'
+import { theme } from './theme'
 
 function BaseProvider({ children }: { children: React.ReactNode }) {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <RouterProvider>{children}</RouterProvider>
     </ChakraProvider>
   )
