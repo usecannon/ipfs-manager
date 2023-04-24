@@ -1,5 +1,12 @@
-import ReactJson from 'react-json-view'
-import { Alert, AlertIcon, Checkbox, Container, Select } from '@chakra-ui/react'
+import {
+  Alert,
+  AlertIcon,
+  Checkbox,
+  Code,
+  Container,
+  Select,
+  Text,
+} from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 
 import { CIDInput } from '../components/CIDInput'
@@ -91,6 +98,7 @@ export function View() {
           Decompress (zlib)
         </Checkbox>
         <Space />
+        <Text>Format</Text>
         <Select
           value={state.format}
           onChange={(evt) => set({ format: evt.target.value as Format })}
@@ -101,6 +109,7 @@ export function View() {
             </option>
           ))}
         </Select>
+        <Space />
         {error && (
           <Alert status="error">
             <AlertIcon />
@@ -118,8 +127,14 @@ export function View() {
         )}
       </Container>
       {state.format === 'json' && !error && jsonContent && (
-        <Container maxW="100%" w="container.md">
-          <ReactJson src={jsonContent as object} />
+        <Container maxW="100%" w="container.lg">
+          <Code
+            paddingY="3"
+            paddingX="4"
+            display="block"
+            whiteSpace="pre-wrap"
+            children={JSON.stringify(jsonContent, null, 2)}
+          />
         </Container>
       )}
     </>

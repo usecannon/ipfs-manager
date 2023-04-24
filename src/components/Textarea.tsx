@@ -25,8 +25,9 @@ export function Textarea({
 }: Props) {
   return (
     <>
-      {label && <Text mb="8px">{label}</Text>}
+      {label && <Text>{label}</Text>}
       <TextareaElement
+        css={{ fontFamily: 'monospace' }}
         name={name}
         value={value}
         aria-label={ariaLabel}
