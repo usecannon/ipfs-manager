@@ -7,9 +7,12 @@ import {
   Tabs,
   Spacer,
   Container,
+  IconButton,
+  useColorMode,
 } from '@chakra-ui/react'
 
 import { Page, useActions, useStore } from '../store'
+import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 
 const pages = ['view', 'upload', 'history'] as const satisfies readonly Page[]
 const titles = ['View', 'Upload', 'History'] as const
@@ -17,6 +20,7 @@ const titles = ['View', 'Upload', 'History'] as const
 export function Menu() {
   const state = useStore()
   const { set } = useActions()
+  const { colorMode, toggleColorMode } = useColorMode()
 
   return (
     <Container maxW="100%" w="container.sm" pr="0.4" paddingY={4}>
@@ -43,6 +47,12 @@ export function Menu() {
             borderRadius="1px"
           />
         </Tabs>
+        <IconButton
+          variant={'ghost'}
+          aria-label="color mode"
+          icon={colorMode === 'dark' ? <SunIcon /> : <MoonIcon />}
+          onClick={toggleColorMode}
+        />
       </Flex>
     </Container>
   )
