@@ -1,6 +1,6 @@
 import { createStore } from './utils/create-store'
 
-export const PAGE = ['view', 'upload', 'history', '404'] as const
+export const PAGE = ['download', 'upload', 'history', '404'] as const
 export const FORMAT = ['text', 'json'] as const
 
 export type Format = (typeof FORMAT)[number]
@@ -17,7 +17,7 @@ export interface State {
 }
 
 const initialState = {
-  page: 'view',
+  page: 'download',
   ipfsGateway: 'https://ipfs.io',
   ipfsApi: 'http://localhost:5001',
   cid: '',
@@ -31,11 +31,11 @@ const actions = {
     return { ...state, ...payload }
   },
 
-  view(state: State, cid: string): State {
-    if (state.cid === cid) return { ...state, page: 'view' }
+  download(state: State, cid: string): State {
+    if (state.cid === cid) return { ...state, page: 'download' }
     return {
       ...state,
-      page: 'view',
+      page: 'download',
       cid,
       content: '',
       compression: false,

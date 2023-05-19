@@ -20,7 +20,7 @@ import { useActions, useStore } from '../store'
 
 const formatTitles = { text: 'Text', json: 'JSON' } as const
 
-export function View() {
+export function Download() {
   const state = useStore()
   const { set } = useActions()
 

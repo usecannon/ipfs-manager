@@ -14,8 +14,13 @@ import {
 import { Page, useActions, useStore } from '../store'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 
-const pages = ['view', 'upload', 'history'] as const satisfies readonly Page[]
-const titles = ['View', 'Upload', 'History'] as const
+const pages = [
+  'download',
+  'upload',
+  'history',
+] as const satisfies readonly Page[]
+
+const titles = ['Download', 'Upload', 'History'] as const
 
 export function Menu() {
   const state = useStore()

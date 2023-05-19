@@ -12,7 +12,7 @@ import { writeIpfs } from '../utils/ipfs'
 export function Upload() {
   const { add } = useItemsList<HistoryItem>('upload-history')
   const state = useStore()
-  const { set, view } = useActions()
+  const { set, download } = useActions()
 
   const [uploading, setUploading] = useState(false)
 
@@ -66,7 +66,7 @@ export function Upload() {
         Upload
       </Button>
       {state.cid && (
-        <Link fontSize="sm" onClick={() => view(state.cid)}>
+        <Link fontSize="sm" onClick={() => download(state.cid)}>
           ← Preview: ipfs://{state.cid}
         </Link>
       )}

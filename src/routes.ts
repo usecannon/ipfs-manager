@@ -6,7 +6,7 @@ type Routes = {
 }
 
 const routes = {
-  view: ['/', '/:cid'],
+  download: ['/', '/:cid'],
   upload: '/upload',
   history: '/history',
   '404': '/404',

@@ -18,7 +18,7 @@ import { useActions } from '../store'
 export interface HistoryItem extends ItemBase {}
 
 export function History() {
-  const { view } = useActions()
+  const { download } = useActions()
   const { del, items } = useItemsList<HistoryItem>('upload-history')
 
   return (
@@ -37,7 +37,9 @@ export function History() {
               <Tr key={item.id}>
                 <Td>{new Date(item.createdAt).toISOString()}</Td>
                 <Td>
-                  <Link onClick={() => view(item.id)}>ipfs://{item.id}</Link>
+                  <Link onClick={() => download(item.id)}>
+                    ipfs://{item.id}
+                  </Link>
                 </Td>
                 <Td>
                   <IconButton

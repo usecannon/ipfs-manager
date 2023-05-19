@@ -2,12 +2,12 @@ import qs from 'qs'
 import { ChakraProvider } from '@chakra-ui/react'
 import { useEffect } from 'react'
 
+import { Download } from './pages/Download'
 import { FORMAT, Format, Page, StoreProvider, useStore } from './store'
 import { History } from './pages/History'
 import { Menu } from './components/Menu'
 import { RouterProvider, useRouter } from './routes'
 import { Upload } from './pages/Upload'
-import { View } from './pages/View'
 import { theme } from './theme'
 
 function BaseProvider({ children }: { children: React.ReactNode }) {
@@ -44,7 +44,7 @@ function Content() {
   const router = useRouter()
 
   function _getQuery() {
-    if (!['view', 'upload'].includes(state.page)) return ''
+    if (!['download', 'upload'].includes(state.page)) return ''
     const query: { compression?: 'true'; format?: Format } = {}
     if (state.compression) query.compression = 'true'
     if (state.format !== 'text') query.format = state.format
@@ -53,7 +53,7 @@ function Content() {
   }
 
   useEffect(() => {
-    if (state.page === 'view') {
+    if (state.page === 'download') {
       const replace = state.page === router.page
       router.navigate(`/${state.cid}${_getQuery()}`, { replace })
     } else if (state.page === 'upload') {
@@ -70,7 +70,7 @@ function Content() {
   }, [state.compression, state.format])
 
   useEffect(() => {
-    if (state.page === 'view') {
+    if (state.page === 'download') {
       router.navigate(`/${state.cid}${_getQuery()}`, { replace: true })
     }
   }, [state.cid])
@@ -80,7 +80,7 @@ function Content() {
   return (
     <>
       <Menu />
-      {state.page === 'view' && <View />}
+      {state.page === 'download' && <Download />}
       {state.page === 'upload' && <Upload />}
       {state.page === 'history' && <History />}
     </>
